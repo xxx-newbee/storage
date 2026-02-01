@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/xxx-newbee/storage"
 )
 
 type Redis struct {
 	client *redis.Client
 }
 
-func NewRedis(client *redis.Client, opts redis.Options) (*storage.AdapterCache, error) {
+func NewRedis(client *redis.Client, opts redis.Options) (*Redis, error) {
 	if client == nil {
 		client = redis.NewClient(&opts)
 	}

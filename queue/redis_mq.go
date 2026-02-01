@@ -63,7 +63,7 @@ func (r *RedisQueue) String() string {
 	return "redis"
 }
 
-// 消息入队
+// Append 消息入队
 func (r *RedisQueue) Append(msg storage.Messager) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
@@ -85,7 +85,7 @@ func (r *RedisQueue) Append(msg storage.Messager) error {
 	return nil
 }
 
-// 注册消费函数
+// Register 注册消费函数
 func (r *RedisQueue) Register(name string, f storage.ConsumerFunc) {
 	if name == "" || f == nil {
 		panic("queue register error")
@@ -93,6 +93,7 @@ func (r *RedisQueue) Register(name string, f storage.ConsumerFunc) {
 	r.consumers.Store(name, f)
 }
 
+// Run 启动消费者
 func (r *RedisQueue) Run() {
 	r.mtx.Lock()
 	if r.running {
@@ -111,6 +112,7 @@ func (r *RedisQueue) Run() {
 	})
 }
 
+// ConsumerLoop 消费循环
 func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 	defer r.wg.Done()
 
@@ -128,7 +130,7 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 				continue
 			}
 
-			// 2.BRPOP堵塞读取消息队列
+			// 2.堵塞读取消息队列，防止消息被多个消费者竞争
 			result, err := r.rdb.BRPop(r.ctx, 5*time.Second, keys...).Result()
 			if err != nil {
 				if errors.Is(err, redis.Nil) {
