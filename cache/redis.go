@@ -12,15 +12,15 @@ type Redis struct {
 	client *redis.Client
 }
 
-func NewRedis(client *redis.Client, opts redis.Options) (storage.AdapterCache, error) {
+func NewRedis(client *redis.Client, opts redis.Options) storage.AdapterCache {
 	if client == nil {
 		client = redis.NewClient(&opts)
 	}
 	r := &Redis{client: client}
 	if err := r.connect(); err != nil {
-		return nil, err
+		panic(err)
 	}
-	return r, nil
+	return r
 }
 
 func (r *Redis) connect() error {
