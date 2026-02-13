@@ -17,8 +17,8 @@ type AdapterCache interface {
 	Del(key string) error
 	HashGet(hk, key string) (string, error)
 	HashDel(hk, key string) error
-	Increase(key string) error
-	Decrease(key string) error
+	Increase(key string) (int64, error)
+	Decrease(key string) (int64, error)
 	Expire(key string, dur time.Duration) error
 }
 
