@@ -52,12 +52,12 @@ func (r *Redis) HashDel(hk, key string) error {
 	return r.client.HDel(context.TODO(), hk, key).Err()
 }
 
-func (r *Redis) Increase(key string) error {
-	return r.client.Incr(context.TODO(), key).Err()
+func (r *Redis) Increase(key string) (int64, error) {
+	return r.client.Incr(context.TODO(), key).Result()
 }
 
-func (r *Redis) Decrease(key string) error {
-	return r.client.Decr(context.TODO(), key).Err()
+func (r *Redis) Decrease(key string) (int64, error) {
+	return r.client.Decr(context.TODO(), key).Result()
 }
 
 func (r *Redis) Expire(key string, dur time.Duration) error {

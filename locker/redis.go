@@ -6,11 +6,19 @@ import (
 
 	"github.com/bsm/redislock"
 	"github.com/redis/go-redis/v9"
+	"github.com/xxx-newbee/storage"
 )
 
 type RedisLocker struct {
 	client *redis.Client
 	mutex  *redislock.Client
+}
+
+func NewRedisLocker(client *redis.Client) storage.AdapterLocker {
+	return &RedisLocker{
+		client: client,
+		mutex:  nil,
+	}
 }
 
 func (r *RedisLocker) String() string {
