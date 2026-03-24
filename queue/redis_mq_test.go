@@ -405,7 +405,7 @@ func TestRedisQueue_Register(t *testing.T) {
 				if err := q.Append(message); err != nil {
 					t.Error(err)
 				}
-
+				time.Sleep(5 * time.Second)
 			},
 		},
 	}

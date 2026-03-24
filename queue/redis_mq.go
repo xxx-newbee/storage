@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -123,9 +124,22 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 
 		default:
 			// 1. 获取所有消息
-			queueKey := fmt.Sprintf("%s:%s", r.defaultPrefix, name)
+			queueKey := fmt.Sprintf("%s:*", r.defaultPrefix)
 			keys, err := r.rdb.Keys(r.ctx, queueKey).Result()
 			if err != nil || len(keys) == 0 {
+				time.Sleep(1 * time.Second)
+				continue
+			}
+			// 去掉 pending 和 dead 队列，只消费 prefix:stream 中的消息
+			var mainKeys []string
+			for _, key := range keys {
+				if strings.HasSuffix(key, "dead") || strings.HasSuffix(key, "pending") {
+					continue
+				}
+				mainKeys = append(mainKeys, key)
+			}
+
+			if len(mainKeys) == 0 {
 				time.Sleep(1 * time.Second)
 				continue
 			}
