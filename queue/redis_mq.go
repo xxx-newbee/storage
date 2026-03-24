@@ -63,7 +63,7 @@ func (r *RedisQueue) String() string {
 	return "redis"
 }
 
-// Append 消息入队
+// Append 消息入队, 消息Stream必须对应消费函数name
 func (r *RedisQueue) Append(msg storage.Messager) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
@@ -123,7 +123,7 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 
 		default:
 			// 1. 获取所有消息
-			queueKey := fmt.Sprintf("%s:*", r.defaultPrefix)
+			queueKey := fmt.Sprintf("%s:%s", r.defaultPrefix, name)
 			keys, err := r.rdb.Keys(r.ctx, queueKey).Result()
 			if err != nil || len(keys) == 0 {
 				time.Sleep(1 * time.Second)

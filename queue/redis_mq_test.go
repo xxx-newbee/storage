@@ -388,6 +388,26 @@ func TestRedisQueue_Register(t *testing.T) {
 				}
 			},
 		},
+		//  场景6：正常注册，正常入队，消费失败
+		{
+			name:         "消费失败",
+			consumerName: "test_consumer_006",
+			consumerFunc: func(msg storage.Messager) error { return errors.New("new func error") },
+			expectPanic:  false,
+			checkFunc: func(t *testing.T, q *RedisQueue, name string) {
+				q.Run()
+				// 插入一条消息
+				message := &Message{
+					ID:     "test_msg_006",
+					Stream: name,
+					Values: map[string]interface{}{"key": "value"},
+				}
+				if err := q.Append(message); err != nil {
+					t.Error(err)
+				}
+
+			},
+		},
 	}
 
 	// 执行所有测试用例
