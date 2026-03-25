@@ -113,7 +113,7 @@ func (r *RedisQueue) Run() {
 	})
 }
 
-// ConsumerLoop 消费循环
+// ConsumerLoop 消费循环，只监听到 prefix:stream
 func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 	defer r.wg.Done()
 
@@ -133,9 +133,11 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 			// 去掉 pending 和 dead 队列，只消费 prefix:stream 中的消息
 			var mainKeys []string
 			for _, key := range keys {
-				if strings.HasSuffix(key, "dead") || strings.HasSuffix(key, "pending") {
+				// 只监听到stream
+				if strings.Count(key, ":") > 1 {
 					continue
 				}
+
 				mainKeys = append(mainKeys, key)
 			}
 
