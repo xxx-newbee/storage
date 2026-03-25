@@ -178,6 +178,7 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 				fmt.Printf("queue consumer [%s] consume msg success: ID=[%s] Stream=%s\n", name, redisMsg.GetID(), redisMsg.GetStream())
 			} else {
 				// 处理失败
+				fmt.Printf("queue consumer [%s] consume msg err: %v\n", name, err)
 				redisMsg.SetErrorCount(redisMsg.GetErrorCount() + 1)
 				if redisMsg.GetErrorCount() >= r.maxRetry {
 					// 超过最大重试次数，转入死信队列
