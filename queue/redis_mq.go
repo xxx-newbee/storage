@@ -64,7 +64,7 @@ func (r *RedisQueue) String() string {
 	return "redis"
 }
 
-// Append 消息入队, 消息Stream必须对应消费函数name
+// Append 消息入队
 func (r *RedisQueue) Append(msg storage.Messager) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
@@ -145,7 +145,7 @@ func (r *RedisQueue) ConsumerLoop(name string, f storage.ConsumerFunc) {
 			}
 
 			// 2.堵塞读取消息队列，防止消息被多个消费者竞争
-			result, err := r.rdb.BRPop(r.ctx, 5*time.Second, keys...).Result()
+			result, err := r.rdb.BRPop(r.ctx, 5*time.Second, mainKeys...).Result()
 			if err != nil {
 				if errors.Is(err, redis.Nil) {
 					continue
